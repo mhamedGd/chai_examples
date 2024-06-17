@@ -62,6 +62,7 @@ func main() {
 
 				thisScene.NewRenderSystem(&chai.SpriteRenderSystem{Sprites: &chai.Sprites, Scale: 0.1})
 				thisScene.NewRenderSystem(&chai.ShapesDrawingSystem{Shapes: &chai.Shapes})
+
 				logo_id := thisScene.NewEntityId()
 				logo_transform := chai.Transform{
 					Position:   chai.Vector2fZero,
@@ -83,7 +84,7 @@ func main() {
 				font_render_system.SetFont("Assets/m5x7.ttf")
 				font_render_system.SetFontBatchRenderer(&chai.UISprites)
 				thisScene.NewRenderSystem(&font_render_system)
-				thisScene.NewUpdateSystem(&DebugTransformSystem{})
+				// thisScene.NewUpdateSystem(&DebugTransformSystem{})
 
 				text_id := thisScene.NewEntityId()
 				text_transform := chai.Transform{
@@ -109,14 +110,13 @@ func main() {
 					}
 				}()
 
-				const GRID_WIDTH = 75
-				const GRID_HEIGHT = 75
+				const GRID_WIDTH = 250
+				const GRID_HEIGHT = 250
 				const CELL_SIZE = float32(1)
 				var GRID_OFFSET chai.Vector2f = chai.Vector2f{X: 0.0, Y: 0.0}
-
+				chai.Shapes.LineWidth = 0.025
 				for x := 0; x < GRID_WIDTH; x++ {
 					for y := 0; y < GRID_HEIGHT; y++ {
-						rectId := thisScene.NewEntityId()
 
 						rectTransform := chai.Transform{
 							Position:   chai.NewVector2f(float32(x)*CELL_SIZE+(float32(x)*0.25), float32(y)*CELL_SIZE+(float32(y)*0.25)).Add(GRID_OFFSET),
@@ -124,10 +124,16 @@ func main() {
 							Scale:      1.0,
 							Rotation:   0,
 						}
+						rectId := thisScene.NewEntityId()
 
 						thisScene.AddComponents(rectId, chai.ToComponent(rectTransform))
-						quadComp := chai.NewQuadComponent(thisScene, rectId, chai.GetRandomRGBA8())
-						thisScene.AddComponents(rectId, chai.ToComponent(quadComp))
+						if (x+y)%2 == 0 {
+							lineComp := chai.NewLineComponent(thisScene, rectId, chai.GetRandomRGBA8(), true)
+							thisScene.AddComponents(rectId, chai.ToComponent(lineComp))
+						} else {
+							triComp := chai.NewTriangleComponent(thisScene, rectId, chai.GetRandomRGBA8(), true)
+							thisScene.AddComponents(rectId, chai.ToComponent(triComp))
+						}
 
 						// rects = append(rects, chai.Pair[chai.Transform, chai.FillRectRenderComponent]{First: rectTransform, Second: rectComp})
 						// RenderQuadTree.Insert(chai.Pair[chai.Transform, chai.FillRectRenderComponent]{First: rectTransform, Second: rectComp}, chai.Rect{Position: rectTransform.Position.Subtract(rectTransform.Dimensions.Scale(0.5)), Size: rectTransform.Dimensions})
@@ -158,12 +164,12 @@ func main() {
 				x_axis := chai.GetActionStrength("right") - chai.GetActionStrength("left")
 				y_axis := chai.GetActionStrength("up") - chai.GetActionStrength("down")
 
-				chai.ScrollView(chai.NewVector2f(x_axis, y_axis).Scale(0.5))
+				chai.ScrollView(chai.NewVector2f(x_axis, y_axis).Scale(0.15))
 				chai.IncreaseScaleU(chai.GetActionStrength("zoomin") - chai.GetActionStrength("zoomout"))
 
 				if chai.IsMousePressed(0) {
 					chai.Shapes.DrawFillRect(chai.GetMouseWorldPosition(), chai.NewVector2f(10, 10), chai.NewRGBA8(255, 255, 255, 100))
-					q := chai.GetQuadsInRect(chai.Rect{Position: chai.GetMouseWorldPosition().Subtract(chai.NewVector2f(5.0, 5.0)), Size: chai.NewVector2f(10.0, 10.0)})
+					q := chai.GetStaticQuadsInRect(chai.Rect{Position: chai.GetMouseWorldPosition().Subtract(chai.NewVector2f(5.0, 5.0)), Size: chai.NewVector2f(10.0, 10.0)})
 					for _, v := range q.Data {
 						chai.RenderQuadTreeContainer.Remove(v)
 					}
@@ -195,21 +201,19 @@ type DebugTransformSystem struct {
 }
 
 func (dts *DebugTransformSystem) Update(dt float32) {
-	chai.Iterate2[chai.Transform, chai.FillRectRenderComponent](func(i ecs.Id, t *chai.Transform, frc *chai.FillRectRenderComponent) {
-		if i == 4 {
-			chai.LogF("Double: %p", t)
-		}
-		t.Position = t.Position.Add(chai.Vector2fDown.Scale(0.05))
-		// t.Rotation += dt * 150.0
-		// t.Rotation += dt * 150.0
-		// t.Rotation += dt * 150.0
-		// t.Rotation += dt * 150.0
-		t.Scale += dt
-	})
+	// chai.Iterate2[chai.Transform, chai.FillRectRenderComponent](func(i ecs.Id, t *chai.Transform, frc *chai.FillRectRenderComponent) {
+	// 	if i == 4 {
+	// 		chai.LogF("Double: %p", t)
+	// 	}
+	// 	t.Position = t.Position.Add(chai.Vector2fDown.Scale(0.05))
+	// 	// t.Rotation += dt * 150.0
+	// 	// t.Rotation += dt * 150.0
+	// 	// t.Rotation += dt * 150.0
+	// 	// t.Rotation += dt * 150.0
+	// 	t.Scale += dt
+	// })
 
-	chai.Iterate1[chai.Transform](func(i ecs.Id, t *chai.Transform) {
-		if i == 4 {
-			chai.LogF("Single: %p", t)
-		}
+	chai.Iterate1[chai.FillRectRenderComponent](func(i ecs.Id, r *chai.FillRectRenderComponent) {
+		// chai.SetPosition(i, chai.GetPosition(i).Add(chai.Vector2fDown.Scale(0.05)))
 	})
 }
