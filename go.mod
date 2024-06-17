@@ -7,6 +7,7 @@ replace github.com/mhamedGd/chai => ../Chai
 require github.com/mhamedGd/chai v0.1.0
 
 require (
+	github.com/google/go-cmp v0.6.0 // indirect
 	github.com/jakecoffman/cp/v2 v2.0.2 // indirect
 	github.com/udhos/goglmath v1.0.0 // indirect
 	golang.org/x/image v0.15.0 // indirect
