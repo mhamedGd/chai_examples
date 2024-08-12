@@ -55,6 +55,8 @@ body{
     justify-content: center;
     align-items: center;
     width: 90vw;
+    image-rendering: crisp-edges; /* for firefox */
+    image-rendering: pixelated;   /* for everything else */
 }
 
 .debug-console-container {
@@ -178,6 +180,8 @@ body{
 
     #viewport {
         width: 50vw;
+        image-rendering: crisp-edges; /* for firefox */
+        image-rendering: pixelated;   /* for everything else */
     }
 
     .mobile-controller {
