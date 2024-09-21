@@ -2,9 +2,8 @@ module Chai_Examples
 
 go 1.22.1
 
-replace github.com/mhamedGd/chai => ../Chai
 
-require github.com/mhamedGd/chai v0.1.0
+require github.com/mhamedGd/chai v0.2.0
 
 require github.com/mhamedgd/ldtkgo-chai v0.0.2 // indirect
 
