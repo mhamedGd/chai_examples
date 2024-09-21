@@ -11,27 +11,10 @@
         <canvas id="viewport" tabindex="1"></canvas>
         <button class="play-button">Play</button>
     </div>
-    <div class="mobile-controller">
-        <div class="controller-set">
-            <a class="dpad up"    id="dpad-up">     <p>u</p></a>
-            <a class="dpad down"  id="dpad-down">   <p>d</p></a>
-            <a class="dpad left"  id="dpad-left">   <p>l</p></a>
-            <a class="dpad right" id="dpad-right">  <p>r</p></a>
-        </div>
-        <div class="controller-set">
-            <a class="button main-button" id="main-button"   ><p>A</p></a>
-            <a class="button side-button" id="side-button" ><p>B</p></a>
-        </div>
-    </div>
+   
     <script type="module" src="./wasm_exec.js"></script>
     <script type="module">
         document.addEventListener("contextmenu", (e) => {e.preventDefault()})
-        /*
-        let canvas = document.getElementById("viewport");
-        canvas.addEventListener("click", async () => {
-            await canvas.requestPointerLock();
-        });
-        */
         
         const go = new Go();        
 
@@ -51,13 +34,13 @@
         let prev_frame_timestamp = Date.now();
         let current_frame_timestamp = Date.now();
         function step(){
+            requestAnimationFrame(step);
             current_frame_timestamp = Date.now();
             let dt = (current_frame_timestamp - prev_frame_timestamp)/1000.0;
             prev_frame_timestamp = current_frame_timestamp;
 
             js_update(dt);
             js_draw();
-            requestAnimationFrame(step);
         }
         })
 
