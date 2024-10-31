@@ -3,6 +3,7 @@ package main
 import (
 	chai "github.com/mhamedGd/chai"
 	"github.com/mhamedGd/chai/ecs"
+	. "github.com/mhamedGd/chai/math"
 )
 
 var tween_animation_app chai.App = chai.App{
@@ -18,16 +19,16 @@ var tween_animation_app chai.App = chai.App{
 			// Here we will create an new Entity and Attach an AnimationComponent that outputs Vector2f values
 			_sprite_moved_id := _this_scene.NewEntityId()
 			_sprite_moved_vt := chai.VisualTransform{
-				Position:   chai.Vector2fZero,
-				Dimensions: chai.NewVector2f(8, 8),
+				Position:   Vector2fZero,
+				Dimensions: NewVector2f(8, 8),
 				Z:          5,
 				Rotation:   0.0,
 				Scale:      1.0,
 				Tint:       chai.WHITE,
-				UV1:        chai.Vector2fZero,
-				UV2:        chai.Vector2fOne,
+				UV1:        Vector2fZero,
+				UV2:        Vector2fOne,
 			}
-			_sprite_tex := chai.LoadPng("Assets/kenney.png", &chai.TextureSettings{Filter: chai.TEXTURE_FILTER_NEAREST})
+			_sprite_tex := chai.LoadPng("Assets/kenney.png", chai.TextureSettings{Filter: chai.TEXTURE_FILTER_NEAREST})
 			// Notice how the last boolean is false, that's because we want the Sprite to move around with the Entity (Not Static)
 			_sprite_moved_comp := chai.NewSpriteComponent(_this_scene, _sprite_moved_id, _sprite_moved_vt, &_sprite_tex, false)
 
@@ -37,15 +38,15 @@ var tween_animation_app chai.App = chai.App{
 			// but wait, How do we actually connect the value of this Animation Component with the Entity's Position?
 			_sprite_moved_animation := chai.NewAnimationComponentVector2f()
 			_sprite_moved_animation.NewTweenAnimationVector2f("Circle", true)
-			_sprite_moved_animation.RegisterKeyframe("Circle", 0.0, chai.NewVector2f(0.0, 16.0))
-			_sprite_moved_animation.RegisterKeyframe("Circle", 0.5, chai.NewVector2f(12.0, 12.0))
-			_sprite_moved_animation.RegisterKeyframe("Circle", 1.0, chai.NewVector2f(16.0, 0.0))
-			_sprite_moved_animation.RegisterKeyframe("Circle", 1.5, chai.NewVector2f(12.0, -12.0))
-			_sprite_moved_animation.RegisterKeyframe("Circle", 2.0, chai.NewVector2f(0.0, -16.0))
-			_sprite_moved_animation.RegisterKeyframe("Circle", 2.5, chai.NewVector2f(-12.0, -12.0))
-			_sprite_moved_animation.RegisterKeyframe("Circle", 3.0, chai.NewVector2f(-16.0, 0.0))
-			_sprite_moved_animation.RegisterKeyframe("Circle", 3.5, chai.NewVector2f(-12.0, 12.0))
-			_sprite_moved_animation.RegisterKeyframe("Circle", 4.0, chai.NewVector2f(0.0, 16.0))
+			_sprite_moved_animation.RegisterKeyframe("Circle", 0.0, NewVector2f(0.0, 16.0))
+			_sprite_moved_animation.RegisterKeyframe("Circle", 0.5, NewVector2f(12.0, 12.0))
+			_sprite_moved_animation.RegisterKeyframe("Circle", 1.0, NewVector2f(16.0, 0.0))
+			_sprite_moved_animation.RegisterKeyframe("Circle", 1.5, NewVector2f(12.0, -12.0))
+			_sprite_moved_animation.RegisterKeyframe("Circle", 2.0, NewVector2f(0.0, -16.0))
+			_sprite_moved_animation.RegisterKeyframe("Circle", 2.5, NewVector2f(-12.0, -12.0))
+			_sprite_moved_animation.RegisterKeyframe("Circle", 3.0, NewVector2f(-16.0, 0.0))
+			_sprite_moved_animation.RegisterKeyframe("Circle", 3.5, NewVector2f(-12.0, 12.0))
+			_sprite_moved_animation.RegisterKeyframe("Circle", 4.0, NewVector2f(0.0, 16.0))
 			_sprite_moved_animation.Play("Circle")
 
 			_this_scene.AddComponents(_sprite_moved_id, chai.ToComponent(_sprite_moved_vt), chai.ToComponent(_sprite_moved_comp), chai.ToComponent(_sprite_moved_animation))
@@ -63,7 +64,7 @@ var tween_animation_app chai.App = chai.App{
 func AnimateBuddyPosition(_this_scene *chai.Scene, _dt float32) {
 	// An ECS Iterator that iterates over all entities that have These 2 Specified components and performs
 	// certain commands, specified by you by providing an appropriate function.
-	chai.Iterate2[chai.VisualTransform, chai.AnimationComponent[chai.Vector2f]](func(i ecs.Id, vt *chai.VisualTransform, ac *chai.AnimationComponent[chai.Vector2f]) {
+	chai.Iterate2[chai.VisualTransform, chai.AnimationComponent[Vector2f]](func(i ecs.Id, vt *chai.VisualTransform, ac *chai.AnimationComponent[Vector2f]) {
 		_anim_value := ac.GetCurrentValue("Circle")
 		vt.Position = _anim_value
 	})

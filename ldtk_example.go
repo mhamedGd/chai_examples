@@ -3,6 +3,7 @@ package main
 import (
 	chai "github.com/mhamedGd/chai"
 	"github.com/mhamedGd/chai/ecs"
+	math "github.com/mhamedGd/chai/math"
 )
 
 var ldtk_app chai.App = chai.App{
@@ -27,10 +28,10 @@ var ldtk_app chai.App = chai.App{
 
 			// Setting the Level_1 to the name we want it to be
 			_ldtk_levels.Set("Ldtk Level", _level)
-			_level_offset := chai.NewVector2f(-112, 105)
+			_level_offset := math.NewVector2f(-112, 105)
 
 			// Loading the tiles and adding them to the StaticQuadTreeContainer responsible for rendering and culling
-			chai.LoadTilemapLevel(_this_scene, "Ldtk Level", _ldtk_levels, 5, _level_offset)
+			chai.LoadTilemapLevel(_this_scene, "Ldtk Level", _ldtk_levels, 5, 1.0, _level_offset)
 
 			// Adding 2 Update Runtime systems,
 			//	- Responsible for updating the movement of Dynamic Bodies
@@ -42,7 +43,7 @@ var ldtk_app chai.App = chai.App{
 			_box_id := _this_scene.NewEntityId()
 			_box_vt := chai.VisualTransform{
 				Position:   _level.Entities.Get("Player")[0].Position,
-				Dimensions: chai.NewVector2f(6.0, 6.0),
+				Dimensions: math.NewVector2f(6.0, 6.0),
 				Rotation:   0.0,
 				Scale:      1.0,
 				Tint:       chai.NewRGBA8(100, 255, 40, 255),
@@ -81,12 +82,12 @@ func PlayerMoveSystem(_this_scene *chai.Scene, _dt float32) {
 		const _SPEED = 20
 
 		// Setting the DynamicBodyComponent velocity (_x_axis * _SPEED, velocity.y)
-		dbc.SetVelocity(chai.Vector2fRight.Scale(_SPEED * _x_axis).Add(chai.Vector2fUp.Scale(dbc.GetVelocity().Y)))
+		dbc.SetVelocity(math.Vector2fRight.Scale(_SPEED * _x_axis).Add(math.Vector2fUp.Scale(dbc.GetVelocity().Y)))
 
 		// Raycasting to only the First Layer (All ldtk loaded levels are on the first phyiscal layer)
-		_hit := chai.RayCast(dbc.GetPosition(), chai.Vector2fDown, 8, chai.PHYSICS_LAYER_1)
+		_hit := chai.RayCast(dbc.GetPosition(), math.Vector2fDown, 8, chai.PHYSICS_LAYER_1)
 		if chai.IsJustPressed("jump") && _hit.HasHit {
-			dbc.ApplyImpulse(chai.Vector2fUp.Scale(17_000), chai.Vector2fZero)
+			dbc.ApplyImpulse(math.Vector2fUp.Scale(17_000), math.Vector2fZero)
 		}
 	})
 }
