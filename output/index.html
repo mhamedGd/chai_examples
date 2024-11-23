@@ -34,13 +34,13 @@
         let prev_frame_timestamp = Date.now();
         let current_frame_timestamp = Date.now();
         function step(){
-            requestAnimationFrame(step);
             current_frame_timestamp = Date.now();
             let dt = (current_frame_timestamp - prev_frame_timestamp)/1000.0;
             prev_frame_timestamp = current_frame_timestamp;
-
+            
             js_update(dt);
             js_draw();
+            requestAnimationFrame(step);
         }
         })
 

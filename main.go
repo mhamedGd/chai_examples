@@ -60,15 +60,17 @@ var sprite_animation_app chai.App = chai.App{
 	},
 }
 
+// //////////////////////////////////////////////////////////////////////////////////////
 func SceneStartSystem(_this_scene *chai.Scene) {
+
 	_db_entity := _this_scene.NewEntityId()
 	_db_vt := chai.VisualTransform{
-		Position:   chmath.NewVector2f(0.0, -1.0),
+		Position:   chmath.NewVector2f(2.0, -1.0),
 		Z:          0.0,
 		Dimensions: chmath.NewVector2f(1.0, 1.0),
 		Rotation:   0.0,
-		Scale:      0.1,
-		Tint:       chai.WHITE,
+		Scale:      0.5,
+		Tint:       chai.RED,
 		UV1:        chmath.Vector2fZero,
 		UV2:        chmath.Vector2fOne,
 	}
@@ -80,24 +82,30 @@ func SceneStartSystem(_this_scene *chai.Scene) {
 
 	_db_settings := chai.DynamicBodySettings{
 		IsTrigger:       false,
-		ColliderShape:   chai.SHAPE_RECTBODY,
+		ColliderShape:   chai.SHAPE_CIRCLEBODY,
 		StartPosition:   _db_vt.Position,
 		Offset:          chmath.Vector2fZero,
 		StartDimensions: _db_vt.Dimensions,
 		StartRotation:   _db_vt.Rotation,
-		Mass:            20, Friction: 0.05, Elasticity: 0.25,
-		GravityScale:      1.0,
-		ConstrainRotation: true,
+		Mass:            50, Friction: 0.2, Elasticity: 0.25,
+		GravityScale:      0.2,
+		ConstrainRotation: false,
 		PhysicsLayer:      chai.PHYSICS_LAYER_ALL,
 	}
 	_db_component := chai.NewDynamicBodyComponent(_db_entity, _db_vt, &_db_settings)
 
-	_this_scene.AddComponents(_db_entity, chai.ToComponent(_db_vt), chai.ToComponent(_db_sprite_component), chai.ToComponent(_db_component))
+	_ps_component := chai.NewParticlesShapeComponent(500, 0.0, func(f float32, p *chai.Particle) {
+		p.Size *= p.LifePercentage
+		p.Velocity = p.Velocity.Scale(p.LifePercentage)
+		p.Color.SetColorAFloat32(p.LifePercentage)
+	})
+
+	_this_scene.AddComponents(_db_entity, chai.ToComponent(_db_vt), chai.ToComponent(_db_sprite_component), chai.ToComponent(_db_component), chai.ToComponent(_ps_component))
 
 	_sb_entity := _this_scene.NewEntityId()
 	_sb_vt := chai.VisualTransform{
 		Position:   chmath.NewVector2f(-4, -2.5),
-		Z:          5.0,
+		Z:          15.0,
 		Dimensions: chmath.NewVector2f(8, 1),
 		Rotation:   0.0,
 		Scale:      1.0,
@@ -121,35 +129,44 @@ func SceneStartSystem(_this_scene *chai.Scene) {
 
 	_this_scene.AddComponents(_sb_entity, chai.ToComponent(_sb_vt), chai.ToComponent(_sb_component), chai.ToComponent(_sb_quad))
 
-	_this_scene.NewUpdateSystem(chai.DynamicBodySystem)
-	_this_scene.NewUpdateSystem(chai.DebugBodyDrawSystem)
-	_this_scene.NewUpdateSystem(MoveDynamicBodySystem)
-
 	_levels := chai.ParseLdtk("Assets/Ldtk/test.ldtk")
 	_lev := _levels.Get("Level_1")
 	_levels.Set("Level_1", _lev)
-	chai.LoadTilemapLevel(_this_scene, "Level_1", _levels, 20.0, 1.0, chmath.NewVector2f(-6, 6))
+	chai.LoadTilemapLevel(_this_scene, "Level_1", _levels, 0.0, 1.0, chmath.NewVector2f(-6, 6))
 
-	chai.Shapes.LineWidth = 0.1
+	_this_scene.NewUpdateSystem(chai.DynamicBodySystem)
+	_this_scene.NewUpdateSystem(MoveDynamicBodySystem)
+	_this_scene.NewUpdateSystem(chai.ParticlesShapeUpdateSystem)
+
+	_this_scene.NewRenderSystem(chai.ParticlesShapeRenderSystem)
+	_this_scene.NewRenderSystem(TestDraw)
+	_this_scene.NewRenderSystem(chai.DebugBodyDrawSystem)
+
 	chai.ScaleView(float32(chai.GetCanvasWidth()) / float32(8))
 }
 
 func MoveDynamicBodySystem(_this_scene *chai.Scene, _dt float32) {
-	chai.Iterate1[chai.DynamicBodyComponent](func(i ecs.Id, dbc *chai.DynamicBodyComponent) {
+	chai.Iterate2[chai.DynamicBodyComponent, chai.ParticlesShapeComponent](func(i ecs.Id, dbc *chai.DynamicBodyComponent, pc *chai.ParticlesShapeComponent) {
 		_x_axis := chai.GetActionStrength("right") - chai.GetActionStrength("left")
-		_speed := float32(2.0)
-		// _velocity := dbc.GetVelocity()
-		dbc.SetVelocity(chmath.NewVector2f(_x_axis*_speed, 0))
+		_speed := float32(6.0)
+		_velocity := dbc.GetVelocity()
 
 		if chai.IsPressed("jump") {
-			dbc.ApplyForce(chmath.Vector2fUp.Scale(2000.0), chmath.Vector2fZero)
+			_velocity.Y = 12.0
+			pc.AddParticles(12, chai.PARTICLES_SHAPE_QUAD, chai.PARTICLES_CIRCLESPREAD, 1.5, 0.1, dbc.GetPosition(), chai.WHITE, 0.4, 0.0)
 		}
+		dbc.SetVelocity(chmath.NewVector2f(_x_axis*_speed, _velocity.Y))
 
 		chai.ScrollTo(dbc.GetPosition())
+
+		chai.LogF("%v", 1/_dt)
 	})
-	chai.Shapes.LineWidth = 0.01
-	chai.Shapes.DrawCircle(chmath.Vector2fUp.Scale(0.0), 0.0, 1.0, chai.RED)
 	chai.IncreaseScaleU((chai.GetActionStrength("zoomin") - chai.GetActionStrength("zoomout")) * 12.0)
+}
+
+func TestDraw(_thisScene *chai.Scene, _dt float32) {
+	chai.DrawLine(chmath.Vector2fZero, chmath.NewVector2f(0, -2), chai.NewRGBA8(255, 255, 0, 100), 10.0)
+	chai.DrawRect(chmath.Vector2fRight.Scale(3), chmath.Vector2fOne.Scale(1.0), chai.RED, 0.0, 40.0)
 }
 
 var app chai.App = chai.App{
