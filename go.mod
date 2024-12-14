@@ -2,6 +2,7 @@ module Chai_Examples
 
 go 1.22.1
 
+replace github.com/mhamedGd/chai => ../chai
 
 require github.com/mhamedGd/chai v0.2.0
 

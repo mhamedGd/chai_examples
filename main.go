@@ -82,7 +82,7 @@ func SceneStartSystem(_this_scene *chai.Scene) {
 
 	_db_settings := chai.DynamicBodySettings{
 		IsTrigger:       false,
-		ColliderShape:   chai.SHAPE_CIRCLEBODY,
+		ColliderShape:   chai.SHAPE_RECTBODY,
 		StartPosition:   _db_vt.Position,
 		Offset:          chmath.Vector2fZero,
 		StartDimensions: _db_vt.Dimensions,
@@ -132,7 +132,7 @@ func SceneStartSystem(_this_scene *chai.Scene) {
 	_levels := chai.ParseLdtk("Assets/Ldtk/test.ldtk")
 	_lev := _levels.Get("Level_1")
 	_levels.Set("Level_1", _lev)
-	chai.LoadTilemapLevel(_this_scene, "Level_1", _levels, 0.0, 1.0, chmath.NewVector2f(-6, 6))
+	chai.LoadTilemapLevel(_this_scene, "Level_1", _levels, 20, 1.0, chmath.NewVector2f(-6, 6))
 
 	_this_scene.NewUpdateSystem(chai.DynamicBodySystem)
 	_this_scene.NewUpdateSystem(MoveDynamicBodySystem)
@@ -165,8 +165,9 @@ func MoveDynamicBodySystem(_this_scene *chai.Scene, _dt float32) {
 }
 
 func TestDraw(_thisScene *chai.Scene, _dt float32) {
-	chai.DrawLine(chmath.Vector2fZero, chmath.NewVector2f(0, -2), chai.NewRGBA8(255, 255, 0, 100), 10.0)
-	chai.DrawRect(chmath.Vector2fRight.Scale(3), chmath.Vector2fOne.Scale(1.0), chai.RED, 0.0, 40.0)
+	// chai.DrawLine(chmath.Vector2fZero, chmath.NewVector2f(0, -2), chai.NewRGBA8(255, 255, 0, 100), 10)
+	// chai.DrawRect(chmath.Vector2fRight.Scale(3), chmath.Vector2fOne.Scale(1.0), chai.RED, 0.0, 40)
+	chai.Renderer.InsertQuad(chmath.Vector2fZero, chmath.NewVector2f(2.0, 2.0), 200, chai.WHITE)
 }
 
 var app chai.App = chai.App{
